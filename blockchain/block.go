@@ -28,8 +28,8 @@ func (b *Block) HashTransactions() []byte {
 
 func CreateBlock(txn []*Transaction, prevHash []byte) *Block {
 	block := &Block{[]byte{}, txn, prevHash, 0}
-	pow := NewProof(block)
-	nonce, hash := pow.Run()
+	pow := NewPOW(block)
+	nonce, hash := pow.RunPOW()
 
 	block.Hash = hash[:]
 	block.Nonce = nonce

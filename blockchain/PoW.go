@@ -21,14 +21,14 @@ import (
 // Requirements:
 // The First few bytes must contain 0s
 
-const Difficulty = 18
+const Difficulty = 5
 
 type ProofOfWork struct {
 	Block  *Block
 	Target *big.Int
 }
 
-func NewProof(b *Block) *ProofOfWork {
+func NewPOW(b *Block) *ProofOfWork {
 	target := big.NewInt(1)
 	target.Lsh(target, uint(256-Difficulty))
 
@@ -51,7 +51,7 @@ func (pow *ProofOfWork) InitData(nonce int) []byte {
 	return data
 }
 
-func (pow *ProofOfWork) Run() (int, []byte) {
+func (pow *ProofOfWork) RunPOW() (int, []byte) {
 	var intHash big.Int
 	var hash [32]byte
 
