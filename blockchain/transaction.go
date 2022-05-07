@@ -22,44 +22,33 @@ type Transaction struct {
 	Outputs []TxOutput
 }
 
-func (tx *Transaction) SetID() {
-	var encoded bytes.Buffer
-	var hash [32]byte
-
-	encode := gob.NewEncoder(&encoded)
-	err := encode.Encode(tx)
-	Handle(err)
-
-	hash = sha256.Sum256(encoded.Bytes())
-	tx.ID = hash[:]
-}
-
 func CoinbaseTx(to, data string) *Transaction {
 	if data == "" {
-		data = fmt.Sprintf("Coins to %s", to)
+		randData := make([]byte, 24)
+		_, err := rand.Read(randData)
+		Handle(err)
+		data = fmt.Sprintf("%x", randData)
 	}
 
 	txin := TxInput{[]byte{}, -1, nil, []byte(data)}
-	txout := NewTXO(100, to)
+	//reward for mining a block is 10
+	txout := NewTXO(10, to)
 
 	tx := Transaction{nil, []TxInput{txin}, []TxOutput{*txout}}
-	tx.SetID()
+	tx.ID = tx.HashTxn()
 
 	return &tx
 }
 
-func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction {
+func NewTransaction(w *wallet.Wallet, to string, amount int, UTXO *UTXO_set) *Transaction {
 	var inputs []TxInput
 	var outputs []TxOutput
 
-	wallets, err := wallet.CreateWallets()
-	Handle(err)
-	w := wallets.GetWallet(from)
 	pubKeyHash := wallet.PublicKeyHash(w.PublicKey)
-	acc, validOutputs := chain.FindSpendableOutputs(pubKeyHash, amount)
+	acc, validOutputs := UTXO.FindSpendableOutputs(pubKeyHash, amount)
 
 	if acc < amount {
-		log.Panic("Error: Insufficient funds")
+		log.Panic("Error: not enough funds")
 	}
 
 	for txid, outs := range validOutputs {
@@ -72,6 +61,8 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 		}
 	}
 
+	from := fmt.Sprintf("%s", w.Address())
+
 	outputs = append(outputs, *NewTXO(amount, to))
 
 	if acc > amount {
@@ -80,7 +71,7 @@ func NewTransaction(from, to string, amount int, chain *BlockChain) *Transaction
 
 	tx := Transaction{nil, inputs, outputs}
 	tx.ID = tx.HashTxn()
-	chain.SignTxn(&tx, w.PrivateKey)
+	UTXO.Blockchain.SignTxn(&tx, w.PrivateKey)
 
 	return &tx
 }
@@ -218,4 +209,13 @@ func (tx Transaction) String() string {
 	}
 
 	return strings.Join(lines, "\n")
+}
+
+func DeserializeTransaction(data []byte) Transaction {
+	var transaction Transaction
+
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&transaction)
+	Handle(err)
+	return transaction
 }

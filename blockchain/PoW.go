@@ -20,7 +20,7 @@ import (
 
 // Requirements:
 // The First few bytes must contain 0s
-
+//Hard coded diffculty, can be lowered for testing
 const Difficulty = 5
 
 type ProofOfWork struct {
