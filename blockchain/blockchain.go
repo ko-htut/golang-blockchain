@@ -17,7 +17,7 @@ import (
 
 const (
 	dbPath      = "./db/blocks_%s"
-	dbFile      = "./tmp/blocks/MANIFEST"
+	dbFile      = "./db/blocks_%s/MANIFEST"
 	genesisData = "First Ever Transaction"
 )
 
@@ -45,7 +45,7 @@ func ContinueBlockChain(nodeID string) *BlockChain {
 
 	opts := badger.DefaultOptions(path)
 
-	db, err := badger.Open(opts)
+	db, err := openDB(path, opts)
 	Handle(err)
 
 	err = db.Update(func(txn *badger.Txn) error {
@@ -72,7 +72,7 @@ func InitBlockChain(address, NodeID string) *BlockChain {
 
 	opts := badger.DefaultOptions(path)
 
-	db, err := badger.Open(opts)
+	db, err := openDB(path, opts)
 	Handle(err)
 
 	err = db.Update(func(txn *badger.Txn) error {
