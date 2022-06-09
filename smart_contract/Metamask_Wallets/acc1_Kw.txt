@@ -1,0 +1,16 @@
+body two tower feed slot judge normal silent chimney hint sister success
+
+Wallet1
+0x303124d5398d01b05c47C9cC12EB424A0eaeD2b1
+Acoin
+0x571b2b56575002efcc75484848aaa7db49cb7113
+
+Wallet2
+0xbeeB3E1900E2C805eF3343E6405A22004D3edD26
+Bcoin
+0xdcf9ee7ca8242899dbb9985d104e5e86a8ea758d
+
+Tokenswap
+0xd4e9caac0e92ca7afa4356f54466da49e6d6a80f
+10000000000000000000
+20000000000000000000
